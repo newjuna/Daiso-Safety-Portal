@@ -1,0 +1,126 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>다이소 안전 포털</title>
+<meta name="description" content="다이소 안전 시스템 입구 · 매장 밀착지원 · 도급 안전관리">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="다이소 포털">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!--
+  다이소 안전 포털 (P1.0) · 로그인 없는 입구 앱 (PWA)
+  ★ 시스템을 더할 때는 아래 APPS 목록에 한 줄만 추가하고 GitHub 에 올리면 끝
+  ★ 고칠 때마다 VER 와 sw.js 의 CACHE 이름을 같이 올림 (예: P1.0 → P1.1)
+-->
+<style>
+ :root{--accent:#d7262e;--red:#E60012;--navy:#111827;--sub:#6b7280;--line:#e5e7eb;--bg:#f3f4f6}
+ *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+ body{margin:0;background:var(--bg);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--navy);letter-spacing:-.2px;-webkit-text-size-adjust:100%}
+ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+ .page{max-width:560px;margin:0 auto;min-height:100vh;background:#fff}
+ .bar{position:sticky;top:0;z-index:5;height:calc(54px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0;display:flex;align-items:center;gap:9px;background:#fff;border-bottom:1px solid #f1f2f4;font-weight:700;font-size:16.5px}
+ .bar .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+ .body{padding:22px 16px calc(30px + env(safe-area-inset-bottom))}
+ .hero{text-align:center;padding:14px 0 6px}
+ .logo{width:76px;height:76px;margin:0 auto;border-radius:21px;background:var(--red);color:#fff;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;font-size:13px}
+ .logo b{font-size:19px}
+ .hero h1{font-size:22px;font-weight:800;margin:14px 0 4px}.hero p{margin:0;font-size:13.5px;color:var(--sub)}
+ .tile{width:100%;text-align:left;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;display:flex;gap:14px;align-items:center}
+ .tile:active{background:#fafafa;transform:scale(.99)}
+ .ic{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex:none}
+ .ic svg.i{width:26px;height:26px}
+ .ic.red{background:#fdecec;color:var(--accent)}.ic.navy{background:var(--navy);color:#fff}.ic.gray{background:var(--bg);color:var(--sub)}
+ .tile h3{margin:0;font-size:16px;font-weight:700}.tile p{margin:4px 0 0;font-size:12.5px;color:var(--sub);line-height:1.45}
+ .who{display:inline-block;margin-top:7px;font-size:11.5px;background:var(--bg);border-radius:8px;padding:2px 8px;color:#374151}
+ .go{margin-left:auto;color:#d1d5db;flex:none}
+ .inst{width:100%;display:flex;align-items:center;gap:10px;border:1px dashed #d1d5db;background:#fff;border-radius:14px;padding:12px 13px;margin-top:20px;font:inherit;font-size:13.5px;text-align:left;color:var(--navy)}
+ .inst small{display:block;color:var(--sub);font-size:12px;margin-top:1px}
+ .inst svg.i{color:var(--accent)}
+ .foot{margin-top:24px;border-top:1px solid #f3f4f6;padding-top:14px;font-size:12px;color:var(--sub);line-height:1.7;text-align:center}
+ .sh{position:fixed;inset:0;z-index:20;background:rgba(17,24,39,.5);display:flex;align-items:flex-end;justify-content:center}
+ .shd{background:#fff;width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:12px 18px calc(18px + env(safe-area-inset-bottom))}
+ .shd .grab{width:40px;height:4px;border-radius:4px;background:#d1d5db;margin:0 auto 12px}
+ .shd h3{margin:0 0 6px;font-size:17px}.shd .ihs{font-size:13px;color:var(--sub);line-height:1.6}
+ .step{display:flex;gap:10px;margin-top:12px;font-size:14px;line-height:1.55}
+ .step i{font-style:normal;flex:none;width:22px;height:22px;border-radius:50%;background:#fdecec;color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+ .btn{width:100%;margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;font:inherit;font-size:14px;font-weight:700;color:var(--navy)}
+ .toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:12px;padding:11px 16px;font-size:13.5px;z-index:30;max-width:90vw}
+ @media(min-width:600px){body{padding:20px 0}.page{border-radius:20px;min-height:auto;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.06)}}
+</style></head><body>
+<div class="page">
+ <div class="bar"><span class="dot"></span>다이소 안전 포털</div>
+ <div class="body">
+  <div class="hero"><div class="logo"><span>DAISO</span><b>안전</b></div><h1>다이소 안전 포털</h1><p>쓰는 시스템을 골라 들어가세요</p></div>
+  <div id="tiles"></div>
+  <button type="button" class="inst" id="inst" hidden></button>
+  <div class="foot">문의 · 안전보건팀<br><span id="ver"></span></div>
+ </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+const VER = 'P1.0';
+/* ===== 타일 목록 · 시스템을 더할 때 여기에 한 줄 =====
+   name 이름 · desc 설명 · who 쓰는 부서 · icon (store | contract | chart | check | users | book) · color (red | navy | gray) · url 주소 */
+const APPS = [
+  { name: '매장 밀착지원', desc: '매장 현장점검 · 결과보고서', who: '안전보건팀', icon: 'store', color: 'red', url: 'https://newjuna.github.io/Daiso-Safety/' },
+  { name: '도급 안전관리', desc: '협력업체 등록 · 작업허가 · 순회점검', who: '인테리어 · 협력업체', icon: 'contract', color: 'navy', url: 'https://newjuna.github.io/Contract-Firebase/' }
+];
+const ICON = {
+  store: '<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M3 9h18"/><path d="M9 20v-6h6v6"/>',
+  contract: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  check: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14a6.5 6.5 0 0 1 3.5 6"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/>',
+  right: '<path d="M9 6l6 6-6 6"/>',
+  install: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3"/><path d="M10.5 18.5h3"/>'
+};
+const ic = (k, sz) => '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"' + (sz ? ' style="width:' + sz + 'px;height:' + sz + 'px"' : '') + '>' + (ICON[k] || '') + '</svg>';
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function toast(t) { const e = document.getElementById('toast'); e.textContent = t; e.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { e.hidden = true; }, 2600); }
+
+document.getElementById('tiles').innerHTML = APPS.map((a) => '<a class="tile" href="' + esc(a.url) + '"><div class="ic ' + esc(a.color || 'gray') + '">' + ic(a.icon) + '</div><div><h3>' + esc(a.name) + '</h3><p>' + esc(a.desc) + '</p>' + (a.who ? '<span class="who">' + esc(a.who) + '</span>' : '') + '</div><span class="go">' + ic('right', 18) + '</span></a>').join('');
+document.getElementById('ver').textContent = '버전 ' + VER;
+
+/* ===== 홈 화면 앱 설치 ===== */
+let EVT = null;
+const isApp = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const inst = document.getElementById('inst');
+function showInst() {
+  if (isApp()) { inst.hidden = true; return; }
+  inst.hidden = false;
+  inst.innerHTML = ic('install', 22) + '<span><b>홈 화면에 앱 추가</b><small>한 번 추가하면 아이콘으로 바로 열려요</small></span>';
+}
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); EVT = e; showInst(); });
+window.addEventListener('appinstalled', () => { EVT = null; inst.hidden = true; toast('홈 화면에 「다이소 포털」을 추가했어요'); });
+function sheet(html) {
+  const d = document.createElement('div'); d.className = 'sh';
+  d.innerHTML = '<div class="shd" role="dialog"><div class="grab"></div>' + html + '<button type="button" class="btn">닫기</button></div>';
+  d.onclick = (e) => { if (e.target === d || e.target.classList.contains('btn')) d.remove(); };
+  document.body.appendChild(d);
+}
+const step = (n, t) => '<div class="step"><i>' + n + '</i><span>' + t + '</span></div>';
+inst.onclick = async () => {
+  if (EVT) { const e = EVT; EVT = null; e.prompt(); try { await e.userChoice; } catch (x) { /* 무시 */ } return; }
+  if (isIOS()) return sheet('<h3>아이폰 · 아이패드에 앱 추가</h3><div class="ihs">사파리에서만 돼요. 카카오톡 · Teams 안에서 열었다면 먼저 「사파리로 열기」를 눌러 주세요.</div>'
+    + step(1, '화면 아래(아이패드는 위) <b>공유 버튼</b>(네모에서 위로 화살표)을 눌러요')
+    + step(2, '목록을 내려서 <b>홈 화면에 추가</b>를 눌러요')
+    + step(3, '오른쪽 위 <b>추가</b>를 누르면 홈 화면에 빨간 「다이소 포털」 아이콘이 생겨요'));
+  sheet('<h3>홈 화면에 앱 추가</h3><div class="ihs">이 브라우저는 설치 창을 아직 준비하지 않았어요. 아래 방법으로 직접 추가해 주세요.</div>'
+    + step(1, '<b>크롬</b>: 오른쪽 위 <b>⋮</b> → <b>홈 화면에 추가</b> (또는 <b>앱 설치</b>)')
+    + step(2, '<b>삼성 인터넷</b>: 아래 <b>☰</b> → <b>현재 페이지 추가</b> → <b>홈 화면</b>')
+    + step(3, '<b>PC 크롬 · 엣지</b>: 주소창 오른쪽 <b>설치 아이콘</b>(모니터에 화살표)'));
+};
+showInst();
+
+/* ===== 서비스 워커 (인터넷이 되면 새 파일 먼저 · 안 되면 받아 둔 화면) ===== */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body></html>
